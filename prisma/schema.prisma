@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  Active
+  Inactive
+  Trigger
+}
+
+model Station {
+  ports Port[]
+  id    String @id @unique
+  name  String
+  status Status @default(Inactive)
+}
+
+model Port {
+  id          String     @unique
+  number      Int
+  device      UsbDevice? @relation(fields: [usbDeviceId], references: [id])
+  Station     Station?   @relation(fields: [stationId], references: [id])
+  stationId   String?
+  usbDeviceId String?
+}
+
+model UsbDevice {
+  id           String  @id 
+  vendorId     Int
+  productId    Int
+  description  String?
+  serialNumber String? @unique
+  Port         Port[]
+}
